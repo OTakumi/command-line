@@ -6,13 +6,14 @@ type MyResult<T> = Result<T, Box<dyn Error>>;
 /// Config struct
 #[derive(Parser, Debug)]
 #[clap(name = "catr", version = "0.1.0", author = "Takumiooo")]
-#[group(multiple = false)]
+#[group(multiple = true)]
 struct Args {
     // Files to read
     #[arg(default_value = "-")]
     files: Vec<String>,
 
     #[arg(short = 'n', long = "number")]
+    #[arg(conflicts_with("number_nonblank_lines"))]
     number_lines: bool,
 
     #[arg(short = 'b', long = "number-nonblank")]
