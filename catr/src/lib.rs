@@ -1,5 +1,7 @@
 use clap::Parser;
 use std::error::Error;
+use std::fs::File;
+use std::io::{self, BufRead, BufReader};
 
 // TODO: Add open file function
 // TODO: Add tests
@@ -45,9 +47,23 @@ pub fn get_args() -> MyResult<Config> {
     })
 }
 
+fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
+    match filename {
+        "-" => Ok(Box::new(BufReader::new(io::stdin()))),
+        _ => Ok(Box::new(BufReader::new(File::open(filename)?))),
+    }
+}
+
 pub fn run(config: Config) -> MyResult<()> {
     for filename in config.files {
-        println!("{}", filename);
+        match open(&filename) {
+            Err(err) => eprintln!("Failed to open {}: {}", filename, err),
+            Ok(file) => {
+                for line in file.lines() {
+                    println!("{}", line?);
+                }
+            }
+        }
     }
 
     Ok(())
