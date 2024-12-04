@@ -41,3 +41,34 @@ fn skip_bad_file() -> TestResult {
 
     Ok(())
 }
+
+/// This helper function runs the program with the given arguments and checks the output.
+fn run(args: &[&str], expected_file: &str) -> TestResult {
+    let expected = fs::read_to_string(expected_file)?;
+    Command::cargo_bin(PRG)?
+        .args(args)
+        .assert()
+        .success()
+        .stdout(expected);
+    Ok(())
+}
+
+#[test]
+fn empty() -> TestResult {
+    run(&[EMPTY], "tests/input/empty.txt")
+}
+
+#[test]
+fn fox() -> TestResult {
+    run(&[FOX], "tests/input/fox.txt")
+}
+
+#[test]
+fn spiders() -> TestResult {
+    run(&[SPIDERS], "tests/input/spiders.txt")
+}
+
+#[test]
+fn bustle() -> TestResult {
+    run(&[BUSTLE], "tests/input/the-bustle.txt")
+}
