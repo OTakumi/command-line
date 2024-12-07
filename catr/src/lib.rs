@@ -55,12 +55,32 @@ fn open(filename: &str) -> MyResult<Box<dyn BufRead>> {
 }
 
 pub fn run(config: Config) -> MyResult<()> {
+    let mut line_num = 1;
+
     for filename in config.files {
         match open(&filename) {
-            Err(err) => eprintln!("Failed to open {}: {}", filename, err),
+            Err(err) => eprintln!("Failed to open {filename}: {err}"),
             Ok(file) => {
-                for line in file.lines() {
-                    println!("{}", line?);
+                // Enumerate returns a tuple containing the index and value of an iterable element
+                for line_result in file.lines() {
+                    let line = line_result?;
+
+                    // number_lines is true
+                    if config.number_lines {
+                        println!("{:6}\t{line}", line_num);
+                    } else if config.number_nonblank_lines {
+                        if !line.is_empty() {
+                            println!("{:6}\t{line}", line_num);
+                        } else {
+                            println!();
+
+                            // If a line is blank, the line number is decremented and the line number is not added.
+                            line_num -= 1;
+                        }
+                    } else {
+                        println!("{line}");
+                    }
+                    line_num += 1;
                 }
             }
         }
